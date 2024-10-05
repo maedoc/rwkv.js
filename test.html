@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <script>
+    var Module = {
+      onRuntimeInitialized: function() {
+        console.log('Module loaded');
+        var n_threads = 4;
+        var rwkv = new Module.RwkvCtx("rwkv6-1.6b.q4_1", n_threads);
+        console.log('rwkv:', rwkv);
+        console.log('rwkv.n_vocab:', rwkv.n_vocab);
+        console.log('rwkv.sysinfo:', rwkv.sysinfo);
+        var prompt = "The capital of France is";
+        console.log('prompt:', prompt);
+        var reply = rwkv.eval_seq(prompt);
+        console.log('reply:', reply);
+      }
+    };
+  </script>
+  <script src="rwkv.js"></script>
+</html>
