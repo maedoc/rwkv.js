@@ -1,3 +1,4 @@
+#include "stdio.h"
 #include <vector>
 #include <string>
 #include <emscripten/bind.h>
@@ -11,8 +12,9 @@ struct RwkvCtx {
     float *logits_out;
     size_t n_vocab;
 
-    RwkvCtx(const char *model_file_path, const uint32_t n_threads) {
-        ctx = rwkv_init_from_file(model_file_path, n_threads, 0);
+    RwkvCtx(const std::string model_file_path, const uint32_t n_threads) {
+        ctx = rwkv_init_from_file(model_file_path.c_str(), n_threads, 0);
+        printf("rwkv ctx = %p\n", ctx);
         n_vocab = rwkv_get_n_vocab(ctx);
         state_in = new float[rwkv_get_state_len(ctx)];
         state_out = new float[rwkv_get_state_len(ctx)];
@@ -42,9 +44,11 @@ struct RwkvCtx {
 
 // Binding code
 EMSCRIPTEN_BINDINGS(rwkv) {
+
   register_vector<uint32_t>("VectorUInt32");
+
   class_<RwkvCtx>("RwkvCtx")
-    .constructor<const char *, const uint32_t>()
+    .constructor<const std::string, const uint32_t>()
     .function("eval_seq", &RwkvCtx::eval_seq)
     .property("n_vocab", &RwkvCtx::n_vocab)
     .property("sysinfo", &RwkvCtx::get_sysinfo)
